@@ -13,7 +13,6 @@ public class SimpleCombat : MonoBehaviour
 
     // Переменные для Input System
     private InputSystem_Actions actions;
-    private InputAction attackAction;
 
     // Состояние
     private bool canAttack = true;
@@ -36,7 +35,7 @@ public class SimpleCombat : MonoBehaviour
     private void OnDisable()
     {
         actions.Player.Attack.performed -= Attack;  // Отписываемся
-        attackAction.Disable();              // Отключаем
+        actions.Player.Disable();              // Отключаем
     }
 
     // Обработчик нажатия кнопки атаки
