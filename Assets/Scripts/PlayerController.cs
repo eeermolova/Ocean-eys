@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
     {
         actions = new InputSystem_Actions();
     }
+
     private void OnEnable()
     {
         actions.Player.Enable();
@@ -43,10 +44,12 @@ public class PlayerController : MonoBehaviour
         actions.Player.Move.performed -= Movement;
         actions.Player.Jump.performed -= Jumping;
     }
+
     void Movement(InputAction.CallbackContext ctx)
     {
         move = ctx.ReadValue<Vector2>().x;
     }
+
     void Jumping(InputAction.CallbackContext ctx)
     {
         if (ctx.performed)
