@@ -22,12 +22,14 @@ public class PlayerController : MonoBehaviour
     float move;
 
     private Rigidbody2D rb;
-    
+    private SimpleCombat combat;
 
     private void Awake()
     {
         actions = new InputSystem_Actions();
+        combat = GetComponentInChildren<SimpleCombat>();
     }
+
     private void OnEnable()
     {
         actions.Player.Enable();
@@ -43,10 +45,12 @@ public class PlayerController : MonoBehaviour
         actions.Player.Move.performed -= Movement;
         actions.Player.Jump.performed -= Jumping;
     }
+
     void Movement(InputAction.CallbackContext ctx)
     {
         move = ctx.ReadValue<Vector2>().x;
     }
+
     void Jumping(InputAction.CallbackContext ctx)
     {
         if (ctx.performed)
@@ -67,6 +71,16 @@ public class PlayerController : MonoBehaviour
     {
         isGrounded = Physics2D.OverlapCircle(groundCheckTransform.position, groundCheckRadius, groundLayer);
         rb.linearVelocityX = move * speed;
+
+        Debug.Log($"Направление: {move}");
+        if (move < 0)
+        {
+            combat.attackPoint.transform.position = new Vector2(transform.position.x - 0.5f, combat.attackPoint.transform.position.y);
+        }
+        else if (move > 0)
+        {
+            combat.attackPoint.transform.position = new Vector2(transform.position.x + 0.5f, combat.attackPoint.transform.position.y);
+        }
     }
 
     void OnDrawGizmosSelected()
