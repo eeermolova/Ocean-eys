@@ -8,7 +8,7 @@ public class SimpleCombat : MonoBehaviour
     [SerializeField] private float attackDamage = 20f;     // Урон за атаку
     [SerializeField] private float attackRange = 1f;       // Дальность атаки
 
-    [SerializeField] private Transform attackPoint;        // Точка, откуда бьем
+    [SerializeField] public Transform attackPoint;        // Точка, откуда бьем
     [SerializeField] private LayerMask enemyLayer;         // Слой врагов
 
     // Переменные для Input System

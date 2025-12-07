@@ -252,7 +252,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -316,7 +316,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -335,7 +335,7 @@ Transform:
   m_GameObject: {fileID: 550529983}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.57, y: -1.37, z: 0}
+  m_LocalPosition: {x: 6.56, y: 2.98, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -353,19 +353,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47a9dee726228a24b9e22665745fe484, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  moveSpeed: 3
+  patrolSpeed: 2
+  patrolChangeTime: 3
+  patrolAreaMin: {x: -20.1, y: -6.9}
+  patrolAreaMax: {x: 18.9, y: 6.44}
+  chaseSpeed: 4
   detectionRange: 10
-  stoppingDistance: 1.5
-  flyingHeight: 2
-  verticalSpeed: 2
-  verticalAmplitude: 0.3
-  attackDamage: 15
+  attackRange: 1.5
+  attackDamage: 10
   attackCooldown: 1
-  attackRange: 1
-  player: {fileID: 29219032}
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 128
+  attackKnockback: 5
+  attackIndicator: {fileID: 0}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  chaseColor: {r: 1, g: 0, b: 0, a: 1}
+  attackColor: {r: 1, g: 0, b: 1, a: 1}
 --- !u!1 &862725260
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,7 +452,7 @@ Transform:
   m_GameObject: {fileID: 862725260}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -2.5, z: 0}
+  m_LocalPosition: {x: 0.029999427, y: -2.8000004, z: 0}
   m_LocalScale: {x: 18, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -640,6 +641,37 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!1 &1898809958
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1898809959}
+  m_Layer: 7
+  m_Name: AttackPoint (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1898809959
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898809958}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.5, y: 0.5, z: 0.5, w: 0.5}
+  m_LocalPosition: {x: -0.5, y: 0, z: -0}
+  m_LocalScale: {x: -0.25799936, y: -0.44696325, z: -0.65012836}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 29219032}
+  m_LocalEulerAnglesHint: {x: -90, y: 90, z: 0}
 --- !u!1 &1993301739
 GameObject:
   m_ObjectHideFlags: 0
@@ -681,11 +713,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 805987693547554949, guid: 080c5d09b89b8ec46a0bc5256009dec3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.61
+      value: -8.33
       objectReference: {fileID: 0}
     - target: {fileID: 805987693547554949, guid: 080c5d09b89b8ec46a0bc5256009dec3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.37
+      value: -1.58
       objectReference: {fileID: 0}
     - target: {fileID: 805987693547554949, guid: 080c5d09b89b8ec46a0bc5256009dec3, type: 3}
       propertyPath: m_LocalPosition.z
@@ -727,6 +759,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 956474334505774150, guid: 080c5d09b89b8ec46a0bc5256009dec3, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 1652232594622832267, guid: 080c5d09b89b8ec46a0bc5256009dec3, type: 3}
       propertyPath: m_Layer
       value: 7
@@ -737,6 +773,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 805987693547554949, guid: 080c5d09b89b8ec46a0bc5256009dec3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1993301740}
+    - targetCorrespondingSourceObject: {fileID: 805987693547554949, guid: 080c5d09b89b8ec46a0bc5256009dec3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1898809959}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 956474334505774150, guid: 080c5d09b89b8ec46a0bc5256009dec3, type: 3}
       insertIndex: -1
