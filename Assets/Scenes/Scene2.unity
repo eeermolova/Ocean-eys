@@ -219,6 +219,7 @@ GameObject:
   m_Component:
   - component: {fileID: 271987196}
   - component: {fileID: 271987197}
+  - component: {fileID: 271987198}
   m_Layer: 0
   m_Name: BackgroundController
   m_TagString: Untagged
@@ -260,6 +261,39 @@ MonoBehaviour:
   autoDetectWidth: 1
   backgroundWidth: 20
   backgroundCount: 3
+--- !u!114 &271987198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 271987195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 854105e2a4766094db61e82357eeea7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RepeatingBackgroundWithClouds
+  backgroundSpeed: 2
+  backgroundWidth: 19.9565
+  cloudSprites:
+  - {fileID: 21300000, guid: e5faa90c270150b438aa23a8baa1e8ff, type: 3}
+  - {fileID: 21300000, guid: dd1d8dff143fa9f4b8da957f8498fed4, type: 3}
+  - {fileID: 21300000, guid: 3f2f9d24bdb3dfc459dbf7987945ba82, type: 3}
+  - {fileID: 21300000, guid: 3d989e2658ede0a40ad16d5040f310ab, type: 3}
+  minCloudSpeed: 1
+  maxCloudSpeed: 3
+  cloudSpawnHeight: 3
+  heightVariation: 1.5
+  minSpawnDelay: 1
+  maxSpawnDelay: 4
+  maxCloudsOnScreen: 4
+  spawnChance: 0.5
+  minCloudScale: 1
+  maxCloudScale: 1.7
+  backgroundSortingLayer: Default
+  backgroundOrderInLayer: 0
+  cloudSortingLayer: Default
+  cloudOrderInLayer: 1
 --- !u!1 &936962290
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,6 +384,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1810696382
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1810696383}
+  m_Layer: 0
+  m_Name: CloudBase
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1810696383
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1810696382}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 10.05668, y: 3.69242, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1873362266
 GameObject:
   m_ObjectHideFlags: 0
@@ -583,3 +648,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 2083111888}
   - {fileID: 271987196}
+  - {fileID: 1810696383}
