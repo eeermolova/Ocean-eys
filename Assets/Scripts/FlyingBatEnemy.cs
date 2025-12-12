@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AggressiveFlyingEnemy : MonoBehaviour
+public class FlyingBatEnemy : MonoBehaviour
 {
     [Header("Настройки патрулирования")]
     [SerializeField] private float patrolSpeed = 3f;
