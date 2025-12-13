@@ -806,42 +806,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c8ac472258450e438a8929670881919, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AutoMovingShip
-  mode: 0
-  autoMoveSpeed: 2
-  autoMoveHeight: -3
-  swayAmount: 0.5
-  swaySpeed: 1
-  maxTiltAngle: 15
-  followSpeed: 8
-  smoothTime: 0.1
-  movementSmoothness: 0.8
-  rotationSmoothness: 0.5
-  currentVelocity: {x: 0, y: 0, z: 0}
-  targetPosition: {x: 0, y: 0, z: 0}
-  targetRotation: {x: 0, y: 0, z: 0, w: 0}
-  rotationVelocity: 0
-  startY: 0
-  timeOffset: 0
-  horizontalOffset: 0
-  verticalOffset: 0
-  currentHorizontalPosition: 0
-  currentSwayPosition: 0
-  swayLayers:
-  - 0
-  - 0
-  - 0
-  - 0
-  layerSpeeds:
-  - 0.15
-  - 0.25
-  - 0.35
-  - 0.1
-  layerAmplitudes:
-  - 0.6
-  - 0.25
-  - 0.1
-  - 0.05
-  mainCamera: {fileID: 0}
 --- !u!1 &1779746411
 GameObject:
   m_ObjectHideFlags: 0
