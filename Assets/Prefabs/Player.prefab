@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6535121741425890878}
   - component: {fileID: 113223016018291350}
   - component: {fileID: 4728158254416368468}
+  - component: {fileID: 6188449988471442689}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -87,7 +88,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 8793639957104055765, guid: d7be602c5c939ae4396b69cda0581f42, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -132,17 +133,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.08700395, y: -0.061137974}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.75, y: 1}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.54381704, y: 0.87772405}
   m_EdgeRadius: 0
 --- !u!50 &5255701067631452977
 Rigidbody2D:
@@ -204,13 +205,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SimpleCombat
   meleeCooldown: 0.1
   meleeDamage: 30
-  meleeRange: 1
+  meleeRange: 0.6
   attackPoint: {fileID: 8709960441716283811}
   enemyLayer:
     serializedVersion: 2
     m_Bits: 64
-  shootCooldown: 0.25
-  shootDamage: 12
+  shootCooldown: 1
+  shootDamage: 15
   bulletSpeed: 18
   shootPoint: {fileID: 1478460880593615771}
   bulletPrefab: {fileID: 2466191536899542944, guid: 868f4d28d0575e0419c42e882aa50e01, type: 3}
@@ -227,7 +228,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e23da1b1a096964883a96fa34dc042d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  maxHealth: 100
+  maxHealth: 5
+--- !u!95 &6188449988471442689
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 956474334505774150}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 37ee3a3c7bc7e62468d50efd922e3a35, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1652232594622832267
 GameObject:
   m_ObjectHideFlags: 0
@@ -253,7 +276,7 @@ Transform:
   m_GameObject: {fileID: 1652232594622832267}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalPosition: {x: 0.094, y: -0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -284,7 +307,7 @@ Transform:
   m_GameObject: {fileID: 4372448243342830619}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0, z: 0}
+  m_LocalPosition: {x: 0.354, y: -0.245, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -315,7 +338,7 @@ Transform:
   m_GameObject: {fileID: 7369443979131393079}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.521, y: -0.009, z: 0}
+  m_LocalPosition: {x: 1.084, y: 0.009, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

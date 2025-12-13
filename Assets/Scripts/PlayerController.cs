@@ -23,11 +23,13 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D rb;
     private SimpleCombat combat;
+    private Animator animator;
 
     private void Awake()
     {
         actions = new InputSystem_Actions();
         combat = GetComponentInChildren<SimpleCombat>();
+        animator = GetComponent<Animator>();
     }
 
     private void OnEnable()
@@ -70,16 +72,31 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         isGrounded = Physics2D.OverlapCircle(groundCheckTransform.position, groundCheckRadius, groundLayer);
-        rb.linearVelocityX = move * speed;
+        if(isGrounded)
+        {
+            animator.SetBool("isGround", true);
+        }
+        else
+        {
+            animator.SetBool("isGround", false);
+        }
+
+            rb.linearVelocityX = move * speed;
 
         Debug.Log($"Направление: {move}");
         if (move < 0)
         {
+            animator.SetBool("isWalking", true);
             combat.attackPoint.transform.position = new Vector2(transform.position.x - 0.5f, combat.attackPoint.transform.position.y);
         }
         else if (move > 0)
         {
+            animator.SetBool("isWalking", true);
             combat.attackPoint.transform.position = new Vector2(transform.position.x + 0.5f, combat.attackPoint.transform.position.y);
+        }
+        else if (move == 0)
+        {
+            animator.SetBool("isWalking", false);
         }
     }
 

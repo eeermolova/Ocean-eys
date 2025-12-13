@@ -151,7 +151,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!61 &3727897808630576342
 BoxCollider2D:
@@ -248,7 +248,10 @@ MonoBehaviour:
   projectileSpawnPoint: {fileID: 6952595100930375081}
   projectileSpeed: 10
   projectileDamage: 12
+  closeAttacksBeforeRanged: 2
+  countCloseAttacksOnlyOnHit: 1
   attackIndicator: {fileID: 0}
+  spriteRenderer: {fileID: 0}
   normalColor: {r: 0, g: 0, b: 0.8039216, a: 1}
   chaseColor: {r: 1, g: 0, b: 0, a: 1}
   attackColor: {r: 1, g: 0, b: 1, a: 1}

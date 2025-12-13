@@ -421,20 +421,22 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
     {
         if (currentState != State.Dashing) return;
         if (dashDidHit) return;
-        if (!other.CompareTag("Player")) return;
 
-        Health playerHealth = other.GetComponent<Health>();
+        // ¬ажно: берЄм корень, чтобы работало даже если коллайдер на child
+        Transform root = other.transform.root;
+        if (!root.CompareTag("Player")) return;
+
+        Health playerHealth = root.GetComponent<Health>();
         if (playerHealth != null)
             playerHealth.TakeDamage(dashDamage);
 
-        Rigidbody2D playerRb = other.GetComponent<Rigidbody2D>();
+        Rigidbody2D playerRb = root.GetComponent<Rigidbody2D>();
         if (playerRb != null)
             playerRb.AddForce(dashDir * dashPlayerKnockback, ForceMode2D.Impulse);
 
         dashDidHit = true;
         dashAfterHitTimer = dashPostHitTime;
 
-        // —читаем ближнюю атаку как "совершЄнную" при реальном попадании
         if (countCloseAttacksOnlyOnHit)
             closeAttacksDone++;
     }
@@ -468,6 +470,14 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         TryDealDashDamage(collision);
+    }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        TryDealDashDamage(collision);
+    }
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        TryDealDashDamage(collision.collider);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
