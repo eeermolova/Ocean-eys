@@ -226,8 +226,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AggressiveFlyingEnemy
   patrolSpeed: 3
   patrolChangeTime: 3
-  patrolAreaMin: {x: -15, y: -5.96}
-  patrolAreaMax: {x: 15, y: 6.1}
+  patrolAreaMin: {x: -15, y: -9}
+  patrolAreaMax: {x: 15, y: 9.12}
   chaseSpeed: 6
   detectionRange: 10
   dashStartRange: 2.2
