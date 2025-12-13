@@ -49,7 +49,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -130,17 +130,17 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 498
-        height: 238
-      alignment: 9
-      pivot: {x: -1.0138922, y: -1.6045837}
+        width: 46
+        height: 59
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8181dde2cf1dce74596f851ba84b22b0
+      spriteID: fa65022c2ea97994c877ce93b35a1848
       internalID: -250405913
       vertices: []
       indices: 
@@ -150,10 +150,10 @@ TextureImporter:
       name: animation pirat_1
       rect:
         serializedVersion: 2
-        x: 501
+        x: 46
         y: 0
-        width: 498
-        height: 238
+        width: 46
+        height: 59
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -162,7 +162,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1bd8f92793546fc41bd24c4dbc39d03d
+      spriteID: 3edd04a563718324f949c9e063240fea
       internalID: -110446518
       vertices: []
       indices: 
@@ -172,10 +172,10 @@ TextureImporter:
       name: animation pirat_2
       rect:
         serializedVersion: 2
-        x: 996
+        x: 92
         y: 0
-        width: 498
-        height: 238
+        width: 46
+        height: 59
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -184,7 +184,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f02af3581da5418499e79f89ce4eb427
+      spriteID: 4ddfa5c1c68f657499adf140d6154844
       internalID: 458940219
       vertices: []
       indices: 
@@ -194,10 +194,10 @@ TextureImporter:
       name: animation pirat_3
       rect:
         serializedVersion: 2
-        x: 1494
+        x: 138
         y: 0
-        width: 498
-        height: 238
+        width: 46
+        height: 59
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -206,7 +206,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 06e260fd47dea964bab9eeab23744534
+      spriteID: d6fdc6bcf8ee8254f9cebb695dbb8fdb
       internalID: -319217455
       vertices: []
       indices: 
@@ -216,10 +216,10 @@ TextureImporter:
       name: animation pirat_4
       rect:
         serializedVersion: 2
-        x: 1992
+        x: 184
         y: 0
-        width: 498
-        height: 238
+        width: 46
+        height: 59
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -228,7 +228,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 52feab42f317b01419aee6ea53bfe2fc
+      spriteID: 8e22f58c85d548e4fb0660fb2388195d
       internalID: 1605963230
       vertices: []
       indices: 
@@ -248,7 +248,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries:
       - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":498.0,"y":238.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":46.0,"y":59.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       animation pirat_0: -250405913
       animation pirat_1: -110446518

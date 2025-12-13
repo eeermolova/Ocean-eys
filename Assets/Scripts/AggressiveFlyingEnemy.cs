@@ -1,14 +1,14 @@
 using UnityEngine;
 
-public class AggressiveFlyingEnemy : MonoBehaviour
+public class AggressiveFlyingEnemy2 : MonoBehaviour
 {
-    [Header("Настройки патрулирования")]
+    [Header("Патрулирование")]
     [SerializeField] private float patrolSpeed = 3f;
     [SerializeField] private float patrolChangeTime = 3f;
     [SerializeField] private Vector2 patrolAreaMin = new Vector2(-10, 2);
-    [SerializeField] private Vector2 patrolAreaMax = new Vector2(10, 5);
+    [SerializeField] private Vector2 patrolAreaMax = new Vector2(10, 6);
 
-    [Header("Настройки преследования")]
+    [Header("Поиск / преследование")]
     [SerializeField] private float chaseSpeed = 6f;
     [SerializeField] private float detectionRange = 10f;
 
@@ -19,35 +19,39 @@ public class AggressiveFlyingEnemy : MonoBehaviour
     [SerializeField] private float dashMaxTime = 0.5f;
     [SerializeField] private float dashDamage = 25f;
     [SerializeField] private float dashPlayerKnockback = 5f;
-    [SerializeField] private float dashPostHitTime = 0.08f;     // немного пролететь "сквозь" после удара
-    [SerializeField] private float dashRecoilSpeed = 7f;        // отлёт врага назад
+    [SerializeField] private float dashPostHitTime = 0.08f; // чуть пролететь после попадания
+    [SerializeField] private float dashRecoilSpeed = 7f;    // отлет врага назад
     [SerializeField] private float dashRecoilTime = 0.35f;
     [SerializeField] private float dashCooldown = 1.6f;
 
     [Header("Атака 2: Дальняя (Projectile)")]
-    [SerializeField] private float rangedMinRange = 3.5f;       // чтобы не стрелял вплотную
+    [SerializeField] private float rangedMinRange = 3.5f;
     [SerializeField] private float rangedMaxRange = 8f;
     [SerializeField] private float rangedWindupTime = 0.25f;
     [SerializeField] private float rangedCooldown = 1.2f;
     [SerializeField] private GameObject projectilePrefab;
-    [SerializeField] private Transform projectileSpawnPoint;    // можно оставить null (тогда из позиции врага)
+    [SerializeField] private Transform projectileSpawnPoint; // можно null
     [SerializeField] private float projectileSpeed = 10f;
     [SerializeField] private float projectileDamage = 12f;
 
-    [Header("Визуальные настройки")]
+    [Header("Условие для стрельбы")]
+    [SerializeField] private int closeAttacksBeforeRanged = 2; // после 2 ближних атак можно стрелять
+    [SerializeField] private bool countCloseAttacksOnlyOnHit = true;
+    // true = считаем только когда реально нанёс урон рывком
+    // false = считаем каждую попытку рывка
+
+    [Header("Визуал (необязательно)")]
     [SerializeField] private GameObject attackIndicator;
+    [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Color normalColor = Color.white;
     [SerializeField] private Color chaseColor = Color.red;
     [SerializeField] private Color attackColor = Color.magenta;
 
-    // Компоненты
     private Transform player;
     private Rigidbody2D rb;
-    private SpriteRenderer spriteRenderer;
     private Collider2D col;
     private Health enemyHealth;
 
-    // Состояния
     private enum State
     {
         Patrolling,
@@ -68,22 +72,29 @@ public class AggressiveFlyingEnemy : MonoBehaviour
     private Vector2 patrolTarget;
     private float nextDirectionChangeTime;
 
-    // Атаки / таймеры
+    // Кулдаун
     private bool canAttack = true;
-    private float stateTimer = 0f;
     private float cooldownTimer = 0f;
+
+    // Таймеры состояния
+    private float stateTimer = 0f;
 
     // Dash runtime
     private Vector2 dashDir;
     private bool dashDidHit = false;
     private float dashAfterHitTimer = 0f;
 
+    // Сколько ближних атак сделано
+    private int closeAttacksDone = 0;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        enemyHealth = GetComponent<Health>();
         col = GetComponent<Collider2D>();
+        enemyHealth = GetComponent<Health>();
+
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Start()
@@ -107,27 +118,21 @@ public class AggressiveFlyingEnemy : MonoBehaviour
     {
         if (enemyHealth != null && !enemyHealth.IsAlive)
         {
-            rb.linearVelocity = Vector2.zero;
+            if (rb != null) rb.linearVelocity = Vector2.zero;
             return;
         }
 
         FindPlayer();
-
-        // Тики состояний с таймерами
         TickStateTimers();
-
-        // Решение "что делать" (только когда не в атакующих состояниях)
         DecideState();
-
-        // Логика патруля/преследования (без физики)
         HandleNonPhysicsLogic();
-
         UpdateVisuals();
     }
 
     private void FixedUpdate()
     {
         if (enemyHealth != null && !enemyHealth.IsAlive) return;
+
         HandleMovement();
         ClampToPatrolArea();
     }
@@ -141,8 +146,8 @@ public class AggressiveFlyingEnemy : MonoBehaviour
             return;
         }
 
-        Health playerHealth = player.GetComponent<Health>();
-        if (playerHealth != null && !playerHealth.IsAlive)
+        Health ph = player.GetComponent<Health>();
+        if (ph != null && !ph.IsAlive)
         {
             player = null;
             EnterPatrol();
@@ -151,7 +156,7 @@ public class AggressiveFlyingEnemy : MonoBehaviour
 
     private void DecideState()
     {
-        // Если мы сейчас в "жёстком" состоянии атаки/кд — не перебиваем.
+        // Не перебиваем атакующие состояния
         if (currentState == State.DashWindup ||
             currentState == State.Dashing ||
             currentState == State.DashRecoil ||
@@ -173,28 +178,29 @@ public class AggressiveFlyingEnemy : MonoBehaviour
             return;
         }
 
-        // Игрок найден -> преследование или атаки
+        // игрок найден
         if (!canAttack)
         {
             EnterChase();
             return;
         }
 
-        // 1) Вблизи — Dash (рывок сквозь)
+        // 1) Вблизи — рывок
         if (dist <= dashStartRange)
         {
             EnterDashWindup();
             return;
         }
 
-        // 2) На дистанции — дальняя атака
-        if (projectilePrefab != null && dist >= rangedMinRange && dist <= rangedMaxRange)
+        // 2) Дальняя атака — только если разблокирована (после 2 ближних)
+        bool rangedUnlocked = closeAttacksDone >= closeAttacksBeforeRanged;
+        if (rangedUnlocked && projectilePrefab != null && dist >= rangedMinRange && dist <= rangedMaxRange)
         {
             EnterRangedWindup();
             return;
         }
 
-        // Иначе просто летим к игроку
+        // иначе просто преследуем
         EnterChase();
     }
 
@@ -237,7 +243,7 @@ public class AggressiveFlyingEnemy : MonoBehaviour
                 }
                 else
                 {
-                    // Если промахнулись и время рывка вышло — тоже уходим в recoil
+                    // промах/не встретили игрока — по таймеру заканчиваем
                     if (stateTimer <= 0f)
                         EnterDashRecoil();
                 }
@@ -253,7 +259,8 @@ public class AggressiveFlyingEnemy : MonoBehaviour
                 stateTimer -= dt;
                 if (stateTimer <= 0f)
                 {
-                    FireProjectile();
+                    FireProjectile();               // код стрельбы оставлен тем же
+                    closeAttacksDone = 0;           // после выстрела сброс
                     EnterCooldown(rangedCooldown);
                 }
                 break;
@@ -264,7 +271,6 @@ public class AggressiveFlyingEnemy : MonoBehaviour
                 {
                     canAttack = true;
 
-                    // после кд — в chase или patrol
                     if (player != null && Vector2.Distance(transform.position, player.position) <= detectionRange)
                         EnterChase();
                     else
@@ -276,6 +282,8 @@ public class AggressiveFlyingEnemy : MonoBehaviour
 
     private void HandleMovement()
     {
+        if (rb == null) return;
+
         Vector2 dir = Vector2.zero;
         float speed = 0f;
 
@@ -311,7 +319,7 @@ public class AggressiveFlyingEnemy : MonoBehaviour
                 break;
 
             case State.Cooldown:
-                // во время кд чуть отлетаем от игрока (чтобы не липнуть)
+                // чуть отлетаем от игрока, чтобы не липнуть
                 if (player != null)
                 {
                     dir = ((Vector2)transform.position - (Vector2)player.position).normalized;
@@ -339,19 +347,10 @@ public class AggressiveFlyingEnemy : MonoBehaviour
         );
     }
 
-    // -------------------------
-    // ВХОДЫ В СОСТОЯНИЯ
-    // -------------------------
+    // --------- Входы в состояния ---------
 
-    private void EnterPatrol()
-    {
-        currentState = State.Patrolling;
-    }
-
-    private void EnterChase()
-    {
-        currentState = State.Chasing;
-    }
+    private void EnterPatrol() => currentState = State.Patrolling;
+    private void EnterChase() => currentState = State.Chasing;
 
     private void EnterDashWindup()
     {
@@ -365,7 +364,6 @@ public class AggressiveFlyingEnemy : MonoBehaviour
         dashDidHit = false;
         dashAfterHitTimer = dashPostHitTime;
 
-        // направление фиксируем перед рывком
         dashDir = ((Vector2)player.position - (Vector2)transform.position).normalized;
         if (dashDir.sqrMagnitude < 0.0001f) dashDir = Vector2.right;
 
@@ -377,7 +375,11 @@ public class AggressiveFlyingEnemy : MonoBehaviour
         currentState = State.Dashing;
         stateTimer = dashMaxTime;
 
-        // чтобы "пролетать сквозь" и не стопориться об коллайдер игрока/объектов
+        // Если нужно считать каждую попытку рывка как "атаку"
+        if (!countCloseAttacksOnlyOnHit)
+            closeAttacksDone++;
+
+        // делаем триггер-коллайдер, чтобы пролетать сквозь игрока
         if (col != null) col.isTrigger = true;
     }
 
@@ -386,7 +388,7 @@ public class AggressiveFlyingEnemy : MonoBehaviour
         currentState = State.DashRecoil;
         stateTimer = dashRecoilTime;
 
-        // возвращаем нормальные коллизии
+        // возвращаем обычные коллизии
         if (col != null) col.isTrigger = false;
 
         if (attackIndicator != null) attackIndicator.SetActive(false);
@@ -413,9 +415,7 @@ public class AggressiveFlyingEnemy : MonoBehaviour
         if (attackIndicator != null) attackIndicator.SetActive(false);
     }
 
-    // -------------------------
-    // УРОН / СНАРЯДЫ
-    // -------------------------
+    // --------- Урон рывком (проходя через игрока) ---------
 
     private void TryDealDashDamage(Collider2D other)
     {
@@ -425,20 +425,21 @@ public class AggressiveFlyingEnemy : MonoBehaviour
 
         Health playerHealth = other.GetComponent<Health>();
         if (playerHealth != null)
-        {
             playerHealth.TakeDamage(dashDamage);
-        }
 
-        // Отбрасывание игрока в направлении рывка
         Rigidbody2D playerRb = other.GetComponent<Rigidbody2D>();
         if (playerRb != null)
-        {
             playerRb.AddForce(dashDir * dashPlayerKnockback, ForceMode2D.Impulse);
-        }
 
         dashDidHit = true;
-        dashAfterHitTimer = dashPostHitTime; // ещё чуть-чуть пролететь, потом recoil
+        dashAfterHitTimer = dashPostHitTime;
+
+        // Считаем ближнюю атаку как "совершённую" при реальном попадании
+        if (countCloseAttacksOnlyOnHit)
+            closeAttacksDone++;
     }
+
+    // --------- Стрельба (код оставлен таким же) ---------
 
     private void FireProjectile()
     {
@@ -450,7 +451,6 @@ public class AggressiveFlyingEnemy : MonoBehaviour
 
         GameObject go = Instantiate(projectilePrefab, spawnPos, Quaternion.identity);
 
-        // Если на префабе есть скрипт EnemyProjectile — инициализируем красиво
         EnemyProjectile ep = go.GetComponent<EnemyProjectile>();
         if (ep != null)
         {
@@ -458,28 +458,22 @@ public class AggressiveFlyingEnemy : MonoBehaviour
         }
         else
         {
-            // fallback: просто зададим скорость риджидбади
             Rigidbody2D prb = go.GetComponent<Rigidbody2D>();
             if (prb != null) prb.linearVelocity = dir * projectileSpeed;
         }
     }
 
-    // -------------------------
-    // COLLISIONS
-    // -------------------------
+    // --------- Коллизии ---------
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Урон рывком
         TryDealDashDamage(collision);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Если вдруг коллизия вместо триггера — тоже отработаем удар
         TryDealDashDamage(collision.collider);
 
-        // Патруль: если упёрлись — сменим точку
         if (currentState == State.Patrolling)
             SetRandomPatrolTarget();
     }
@@ -488,57 +482,49 @@ public class AggressiveFlyingEnemy : MonoBehaviour
     {
         if (spriteRenderer == null) return;
 
-        Color targetColor = normalColor;
+        Color target = normalColor;
 
         switch (currentState)
         {
             case State.Patrolling:
-                targetColor = normalColor;
-                break;
+                target = normalColor; break;
             case State.Chasing:
-                targetColor = chaseColor;
-                break;
+                target = chaseColor; break;
             case State.DashWindup:
             case State.Dashing:
             case State.DashRecoil:
             case State.RangedWindup:
-                targetColor = attackColor;
-                break;
+                target = attackColor; break;
             case State.Cooldown:
-                targetColor = Color.gray;
-                break;
+                target = Color.gray; break;
         }
 
-        spriteRenderer.color = Color.Lerp(spriteRenderer.color, targetColor, Time.deltaTime * 5f);
+        spriteRenderer.color = Color.Lerp(spriteRenderer.color, target, Time.deltaTime * 5f);
 
-        if (rb.linearVelocity.x > 0.1f) spriteRenderer.flipX = false;
-        else if (rb.linearVelocity.x < -0.1f) spriteRenderer.flipX = true;
+        if (rb != null)
+        {
+            if (rb.linearVelocity.x > 0.1f) spriteRenderer.flipX = false;
+            else if (rb.linearVelocity.x < -0.1f) spriteRenderer.flipX = true;
+        }
     }
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.blue;
-        Vector2 center = new Vector2(
-            (patrolAreaMin.x + patrolAreaMax.x) / 2,
-            (patrolAreaMin.y + patrolAreaMax.y) / 2
-        );
-        Vector2 size = new Vector2(
-            patrolAreaMax.x - patrolAreaMin.x,
-            patrolAreaMax.y - patrolAreaMin.y
-        );
-        Gizmos.DrawWireCube(center, size);
-
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, dashStartRange);
 
-        Gizmos.color = new Color(1f, 0.5f, 0f); // оранжевый
+        Gizmos.color = new Color(1f, 0.5f, 0f);
         Gizmos.DrawWireSphere(transform.position, rangedMaxRange);
 
         Gizmos.color = new Color(1f, 0.8f, 0.2f);
         Gizmos.DrawWireSphere(transform.position, rangedMinRange);
+
+        Gizmos.color = Color.cyan;
+        Vector2 center = new Vector2((patrolAreaMin.x + patrolAreaMax.x) * 0.5f, (patrolAreaMin.y + patrolAreaMax.y) * 0.5f);
+        Vector2 size = new Vector2(Mathf.Abs(patrolAreaMax.x - patrolAreaMin.x), Mathf.Abs(patrolAreaMax.y - patrolAreaMin.y));
+        Gizmos.DrawWireCube(center, size);
     }
 }
-
