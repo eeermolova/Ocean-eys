@@ -3,100 +3,128 @@ using UnityEngine.InputSystem;
 
 public class SimpleCombat : MonoBehaviour
 {
-    // Основные настройки (видны в инспекторе)
-    [SerializeField] private float attackCooldown = 0.5f;  // Задержка между атаками
-    [SerializeField] private float attackDamage = 20f;     // Урон за атаку
-    [SerializeField] private float attackRange = 1f;       // Дальность атаки
+    [Header("Ближняя атака")]
+    [SerializeField] private float meleeCooldown = 0.5f;
+    [SerializeField] private float meleeDamage = 20f;
+    [SerializeField] private float meleeRange = 1f;
+    [SerializeField] public Transform attackPoint;
+    [SerializeField] private LayerMask enemyLayer;
 
-    [SerializeField] public Transform attackPoint;        // Точка, откуда бьем
-    [SerializeField] private LayerMask enemyLayer;         // Слой врагов
+    [Header("Дальняя атака (пистолет)")]
+    [SerializeField] private float shootCooldown = 0.25f;
+    [SerializeField] private float shootDamage = 12f;
+    [SerializeField] private float bulletSpeed = 18f;
+    [SerializeField] private Transform shootPoint;           // точка вылета пули
+    [SerializeField] private GameObject bulletPrefab;        // префаб пули
+    [SerializeField] private Camera mainCamera;              // можно не назначать (возьмём Camera.main)
 
-    // Переменные для Input System
     private InputSystem_Actions actions;
 
-    // Состояние
-    private bool canAttack = true;
-    private float lastAttackTime = 0f;
+    private float lastMeleeTime = -999f;
+    private float lastShootTime = -999f;
 
-    // Метод Awake вызывается при создании объекта
     private void Awake()
     {
         actions = new InputSystem_Actions();
+        if (mainCamera == null) mainCamera = Camera.main;
     }
 
-    // При включении объекта
     private void OnEnable()
     {
         actions.Player.Enable();
-        actions.Player.Attack.performed += Attack;  // Подписываемся на событие
+        actions.Player.Attack.performed += OnMelee;
+        actions.Player.Shoot.performed += OnShoot; // <-- нужен экшен Shoot в Input Actions
     }
 
-    // При выключении объекта
     private void OnDisable()
     {
-        actions.Player.Attack.performed -= Attack;  // Отписываемся
-        actions.Player.Disable();              // Отключаем
+        actions.Player.Attack.performed -= OnMelee;
+        actions.Player.Shoot.performed -= OnShoot;
+        actions.Player.Disable();
     }
 
-    // Обработчик нажатия кнопки атаки
-    private void Attack(InputAction.CallbackContext context)
+    private void OnMelee(InputAction.CallbackContext context)
     {
-        // Если можем атаковать - атакуем
-        if (canAttack)
-        {
-            Attack();
-        }
+        DoMeleeAttack();
     }
 
-    // Основной метод атаки
-    private void Attack()
+    private void OnShoot(InputAction.CallbackContext context)
     {
-        // Проверяем кулдаун
-        if (Time.time - lastAttackTime < attackCooldown) return;
+        Debug.Log("ПКМ нажата -> Shoot action сработал");
+        
 
-        // Обновляем время последней атаки
-        lastAttackTime = Time.time;
+        DoShoot();
+    }
 
-        // Ищем врагов в радиусе
+    private void DoMeleeAttack()
+    {
+        if (attackPoint == null) return;
+        if (Time.time - lastMeleeTime < meleeCooldown) return;
+
+        lastMeleeTime = Time.time;
+
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
-            attackPoint.position,  // Центр поиска
-            attackRange,           // Радиус поиска
-            enemyLayer             // Ищем только врагов
+            attackPoint.position,
+            meleeRange,
+            enemyLayer
         );
 
-        // Наносим урон всем найденным врагам
         foreach (Collider2D enemy in hitEnemies)
         {
-            // Пытаемся получить компонент Health у врага
             Health enemyHealth = enemy.GetComponent<Health>();
-
-            // Если у врага есть здоровье - наносим урон
             if (enemyHealth != null)
+                enemyHealth.TakeDamage(meleeDamage);
+        }
+    }
+
+    private void DoShoot()
+    {
+        Debug.Log("ПКМ: выстрел вызван");
+
+        if (bulletPrefab == null) { Debug.LogWarning("bulletPrefab = null"); return; }
+        if (shootPoint == null) { Debug.LogWarning("shootPoint = null"); return; }
+        if (mainCamera == null) mainCamera = Camera.main;
+        if (mainCamera == null) { Debug.LogWarning("mainCamera = null"); return; }
+        if (Mouse.current == null) { Debug.LogWarning("Mouse.current = null"); return; }
+
+        if (bulletPrefab == null || shootPoint == null) return;
+        if (mainCamera == null) mainCamera = Camera.main;
+        if (mainCamera == null) return;
+
+        if (Time.time - lastShootTime < shootCooldown) return;
+        lastShootTime = Time.time;
+
+        // куда целимся (в точку курсора)
+        Vector2 mouseScreen = Mouse.current.position.ReadValue();
+        Vector3 mouseWorld3 = mainCamera.ScreenToWorldPoint(new Vector3(mouseScreen.x, mouseScreen.y, 0f));
+        Vector2 dir = ((Vector2)mouseWorld3 - (Vector2)shootPoint.position).normalized;
+        if (dir.sqrMagnitude < 0.0001f) dir = Vector2.right;
+
+        GameObject b = Instantiate(bulletPrefab, shootPoint.position, Quaternion.identity);
+
+        // если на пуле есть PlayerBullet — инициализируем
+        PlayerBullet pb = b.GetComponent<PlayerBullet>();
+        if (pb != null)
+        {
+            pb.Init(dir, bulletSpeed, shootDamage, enemyLayer, gameObject);
+        }
+        else
+        {
+            // fallback: просто зададим скорость Rigidbody2D
+            Rigidbody2D rb = b.GetComponent<Rigidbody2D>();
+            if (rb != null)
             {
-                enemyHealth.TakeDamage(attackDamage);
+                rb.gravityScale = 0f;
+                rb.linearVelocity = dir * bulletSpeed;
             }
         }
-
-        // Включаем кулдаун
-        canAttack = false;
-
-        // Через время attackCooldown снова разрешаем атаку
-        Invoke(nameof(ResetAttack), attackCooldown);
     }
 
-    // Сброс состояния атаки
-    private void ResetAttack()
-    {
-        canAttack = true;
-    }
-
-    // Метод для отрисовки радиуса атаки в редакторе
     private void OnDrawGizmosSelected()
     {
         if (attackPoint == null) return;
-
-        // Рисуем красный круг - радиус атаки
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(attackPoint.position, attackRange);
+        Gizmos.DrawWireSphere(attackPoint.position, meleeRange);
     }
 }
+
