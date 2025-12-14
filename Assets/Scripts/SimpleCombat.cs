@@ -73,7 +73,7 @@ public class SimpleCombat : MonoBehaviour
 
     private IEnumerator GunShootSequence()
     {
-        lastShootTime = Time.time;
+        
 
         if (animator != null) animator.SetTrigger("GunDraw");
         yield return new WaitForSeconds(gunDrawTime);
@@ -83,6 +83,7 @@ public class SimpleCombat : MonoBehaviour
 
         // ТУТ вызывай твой текущий код спавна пули (он у тебя уже есть)
         SpawnBullet();
+        lastShootTime = Time.time;
     }
 
     private void DoMeleeAttack()
@@ -121,9 +122,6 @@ public class SimpleCombat : MonoBehaviour
         if (bulletPrefab == null || shootPoint == null) return;
         if (mainCamera == null) mainCamera = Camera.main;
         if (mainCamera == null) return;
-
-        if (Time.time - lastShootTime < shootCooldown) return;
-        lastShootTime = Time.time;
 
         // куда целимся (в точку курсора)
         Vector2 mouseScreen = Mouse.current.position.ReadValue();
