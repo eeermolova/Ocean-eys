@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class AggressiveFlyingEnemy2 : MonoBehaviour
 {
@@ -47,6 +48,30 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
     [SerializeField] private Color chaseColor = Color.red;
     [SerializeField] private Color attackColor = Color.magenta;
 
+    [Header("јнимации (призрак)")]
+    [SerializeField] private bool useAnimator = true;
+    [SerializeField] private float dashAnimSpeedMultiplier = 1.3f; // опционально: ускорить idle при рывке
+
+    [Header("‘лип (направление спрайта)")]
+    [SerializeField] private bool spriteFacesRightByDefault = false;
+
+    [Header("—мерть (удаление)")]
+    [SerializeField] private float destroyDelay = 0.8f; // поставь длину Ghost_damage/Death
+    [SerializeField] private bool disableColliderOnDeath = true;
+
+    [Header(" оллизии (призрак)")]
+    [SerializeField] private bool alwaysTriggerCollider = true; // чтобы не толкал игрока
+
+    private bool deathHandled = false;
+
+
+    private Animator animator;
+    private bool deathAnimSent = false;
+
+    private static readonly int ANIM_SHOOT = Animator.StringToHash("Attack2");
+    private static readonly int ANIM_HIT = Animator.StringToHash("Hit");
+    private static readonly int ANIM_DEAD = Animator.StringToHash("IsDead");
+
     private Transform player;
     private Rigidbody2D rb;
     private Collider2D col;
@@ -90,11 +115,24 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        if (rb == null) rb = GetComponentInChildren<Rigidbody2D>();
+
         col = GetComponent<Collider2D>();
+        if (col == null) col = GetComponentInChildren<Collider2D>();
+
+        if (alwaysTriggerCollider && col != null)
+            col.isTrigger = true;
+
         enemyHealth = GetComponent<Health>();
+        if (enemyHealth == null) enemyHealth = GetComponentInChildren<Health>();
+
+        animator = GetComponent<Animator>();
+        if (animator == null) animator = GetComponentInChildren<Animator>();
 
         if (spriteRenderer == null)
             spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
     private void Start()
@@ -104,6 +142,8 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
             rb.gravityScale = 0f;
             rb.freezeRotation = true;
         }
+
+        if (col != null) col.isTrigger = true;
 
         SetRandomPatrolTarget();
         nextDirectionChangeTime = Time.time + patrolChangeTime;
@@ -118,7 +158,7 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
     {
         if (enemyHealth != null && !enemyHealth.IsAlive)
         {
-            if (rb != null) rb.linearVelocity = Vector2.zero;
+            HandleDeath();
             return;
         }
 
@@ -368,7 +408,75 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
         if (dashDir.sqrMagnitude < 0.0001f) dashDir = Vector2.right;
 
         if (attackIndicator != null) attackIndicator.SetActive(true);
+
+        
     }
+
+    private void OnEnable()
+    {
+        if (enemyHealth != null)
+        {
+            enemyHealth.Damaged += OnDamaged;
+            enemyHealth.Died += OnDied;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (enemyHealth != null)
+        {
+            enemyHealth.Damaged -= OnDamaged;
+            enemyHealth.Died -= OnDied;
+        }
+    }
+
+    private void OnDamaged(float dmg)
+    {
+        // ¬ј∆Ќќ: если этот удар был смертельным Ч IsAlive уже false, значит Hit не дергаем
+        if (!useAnimator || animator == null) return;
+        if (deathHandled) return;
+        if (enemyHealth != null && enemyHealth.IsAlive)
+        {
+            animator.SetTrigger(ANIM_HIT); // играет Ghost_damage
+        }
+    }
+
+    private void OnDied()
+    {
+        // чтобы смерть стартовала сразу в момент добивани€
+        if (!deathHandled)
+            HandleDeath();
+    }
+
+
+    private void HandleDeath()
+    {
+        if (deathHandled) return;
+        deathHandled = true;
+
+        if (useAnimator && animator != null)
+        {
+            animator.ResetTrigger(ANIM_HIT);   // важно, чтобы Hit не конфликтовал
+            animator.SetBool(ANIM_DEAD, true); // IsDead=true -> переход в Уdeath/damageФ state
+        }
+
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+
+        // важно: выключить коллайдер/триггер, чтобы не продолжал ловить OnTriggerStay
+        if (disableColliderOnDeath && col != null)
+            col.enabled = false;
+
+        enabled = false;
+
+        StartCoroutine(DestroyAfterDelay());
+    }
+
+    private IEnumerator DestroyAfterDelay()
+    {
+        yield return new WaitForSeconds(destroyDelay);
+        Destroy(gameObject);
+    }
+
 
     private void EnterDashing()
     {
@@ -380,7 +488,9 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
             closeAttacksDone++;
 
         // делаем триггер-коллайдер, чтобы пролетать сквозь игрока
-        if (col != null) col.isTrigger = true;
+        if (!alwaysTriggerCollider && col != null)
+            col.isTrigger = true;
+
     }
 
     private void EnterDashRecoil()
@@ -389,7 +499,9 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
         stateTimer = dashRecoilTime;
 
         // возвращаем обычные коллизии
-        if (col != null) col.isTrigger = false;
+        //if (!alwaysTriggerCollider && col != null)
+            //col.isTrigger = false;
+
 
         if (attackIndicator != null) attackIndicator.SetActive(false);
     }
@@ -404,6 +516,9 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
 
         if (attackIndicator != null) attackIndicator.SetActive(true);
+
+        if (useAnimator && animator != null)
+            animator.SetTrigger(ANIM_SHOOT);
     }
 
     private void EnterCooldown(float cd)
@@ -419,22 +534,26 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
 
     private void TryDealDashDamage(Collider2D other)
     {
+        Debug.Log("GHOST: HIT PLAYER");
+
         if (currentState != State.Dashing) return;
         if (dashDidHit) return;
-        if (!other.CompareTag("Player")) return;
 
-        Health playerHealth = other.GetComponent<Health>();
+        // ¬ажно: берЄм корень, чтобы работало даже если коллайдер на child
+        Transform root = other.transform.root;
+        if (!root.CompareTag("Player")) return;
+
+        Health playerHealth = root.GetComponent<Health>();
         if (playerHealth != null)
             playerHealth.TakeDamage(dashDamage);
 
-        Rigidbody2D playerRb = other.GetComponent<Rigidbody2D>();
+        Rigidbody2D playerRb = root.GetComponent<Rigidbody2D>();
         if (playerRb != null)
             playerRb.AddForce(dashDir * dashPlayerKnockback, ForceMode2D.Impulse);
 
         dashDidHit = true;
         dashAfterHitTimer = dashPostHitTime;
 
-        // —читаем ближнюю атаку как "совершЄнную" при реальном попадании
         if (countCloseAttacksOnlyOnHit)
             closeAttacksDone++;
     }
@@ -469,6 +588,14 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
     {
         TryDealDashDamage(collision);
     }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        TryDealDashDamage(collision);
+    }
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        TryDealDashDamage(collision.collider);
+    }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -501,10 +628,15 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
 
         spriteRenderer.color = Color.Lerp(spriteRenderer.color, target, Time.deltaTime * 5f);
 
-        if (rb != null)
+        if (rb != null && rb.linearVelocity.x > 0.1f)
         {
-            if (rb.linearVelocity.x > 0.1f) spriteRenderer.flipX = false;
-            else if (rb.linearVelocity.x < -0.1f) spriteRenderer.flipX = true;
+            // движемс€ вправо
+            spriteRenderer.flipX = !spriteFacesRightByDefault;
+        }
+        else if (rb != null && rb.linearVelocity.x < -0.1f)
+        {
+            // движемс€ влево
+            spriteRenderer.flipX = spriteFacesRightByDefault;
         }
     }
 

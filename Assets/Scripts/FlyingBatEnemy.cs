@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class FlyingBatEnemy : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class FlyingBatEnemy : MonoBehaviour
     [Header("Настройки преследования")]
     [SerializeField] private float chaseSpeed = 6f;
     [SerializeField] private float detectionRange = 10f;
-    [SerializeField] private float attackRange = 1.5f;
+    [SerializeField] private float attackRange = 0.37f;
 
     [Header("Настройки атаки")]
     [SerializeField] private float attackDamage = 25f;
@@ -23,6 +24,26 @@ public class FlyingBatEnemy : MonoBehaviour
     [SerializeField] private Color normalColor = Color.white;
     [SerializeField] private Color chaseColor = Color.red;
     [SerializeField] private Color attackColor = Color.magenta;
+
+    [Header("Флип (направление спрайта)")]
+    [SerializeField] private bool spriteFacesRightByDefault = false;
+
+    [Header("Анимации (Bat)")]
+    [SerializeField] private bool useAnimator = true;
+    [SerializeField] private float chaseAnimSpeedMultiplier = 1.2f; // опционально
+    [SerializeField] private bool hasAttackAnimation = false;
+    [Header("Смерть (удаление)")]
+    [SerializeField] private float destroyDelay = 0.8f; // поставь примерно длину Bat_death
+    [SerializeField] private bool disableColliderOnDeath = true;
+
+    private bool deathHandled = false;
+    private Collider2D myCollider;
+
+    private Animator animator;
+    private bool deathAnimSent = false;
+
+    private static readonly int ANIM_ATTACK = Animator.StringToHash("Attack");
+    private static readonly int ANIM_DEAD = Animator.StringToHash("IsDead");
 
     // Компоненты
     private Transform player;
@@ -44,9 +65,21 @@ public class FlyingBatEnemy : MonoBehaviour
 
     private void Awake()
     {
+        myCollider = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
+        if (rb == null) rb = GetComponentInChildren<Rigidbody2D>();
+
         spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
         enemyHealth = GetComponent<Health>();
+        if (enemyHealth == null) enemyHealth = GetComponentInChildren<Health>();
+
+        animator = GetComponent<Animator>();
+        if (animator == null) animator = GetComponentInChildren<Animator>();
+
+        if (rb == null) Debug.LogError($"{name}: Rigidbody2D не найден");
+        if (spriteRenderer == null) Debug.LogError($"{name}: SpriteRenderer не найден");
     }
 
     private void Start()
@@ -77,7 +110,7 @@ public class FlyingBatEnemy : MonoBehaviour
         // Проверка здоровья
         if (enemyHealth != null && !enemyHealth.IsAlive)
         {
-            rb.linearVelocity = Vector2.zero;
+            HandleDeath();
             return;
         }
 
@@ -266,6 +299,9 @@ public class FlyingBatEnemy : MonoBehaviour
     {
         if (!canAttack) return;
 
+        if (useAnimator && hasAttackAnimation && animator != null)
+            animator.SetTrigger(ANIM_ATTACK);
+
         Health playerHealth = player.GetComponent<Health>();
         if (playerHealth != null)
         {
@@ -303,6 +339,37 @@ public class FlyingBatEnemy : MonoBehaviour
         }
     }
 
+    private void HandleDeath()
+    {
+        if (deathHandled) return;
+        deathHandled = true;
+
+        // включаем анимацию смерти
+        if (useAnimator && animator != null && !deathAnimSent)
+        {
+            deathAnimSent = true;
+            animator.SetBool(ANIM_DEAD, true);
+        }
+
+        // стоп движение
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+
+        // выключаем коллайдер, чтобы больше ничего не триггерилось
+        if (disableColliderOnDeath && myCollider != null)
+            myCollider.enabled = false;
+
+        // можно отключить сам скрипт, чтобы гарантированно не работал
+        enabled = false;
+
+        StartCoroutine(DestroyAfterDelay());
+    }
+
+    private IEnumerator DestroyAfterDelay()
+    {
+        yield return new WaitForSeconds(destroyDelay);
+        Destroy(gameObject);
+    }
+
     private void UpdateVisuals()
     {
         if (spriteRenderer == null) return;
@@ -328,13 +395,15 @@ public class FlyingBatEnemy : MonoBehaviour
         spriteRenderer.color = Color.Lerp(spriteRenderer.color, targetColor, Time.deltaTime * 5f);
 
         // Поворачиваем спрайт по направлению движения
-        if (rb.linearVelocity.x > 0.1f)
+        if (rb != null && rb.linearVelocity.x > 0.1f)
         {
-            spriteRenderer.flipX = false;
+            // движемся вправо
+            spriteRenderer.flipX = !spriteFacesRightByDefault;
         }
         else if (rb.linearVelocity.x < -0.1f)
         {
-            spriteRenderer.flipX = true;
+            // движемся влево
+            spriteRenderer.flipX = spriteFacesRightByDefault;
         }
     }
 

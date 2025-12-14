@@ -1,6 +1,7 @@
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -18,16 +19,21 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundLayer;
 
     bool isGrounded;
-
+    private SpriteRenderer sr;
+    private bool facingRight = true;
     float move;
 
     private Rigidbody2D rb;
     private SimpleCombat combat;
+    private Animator animator;
 
     private void Awake()
     {
         actions = new InputSystem_Actions();
         combat = GetComponentInChildren<SimpleCombat>();
+        animator = GetComponent<Animator>();
+        sr = GetComponentInChildren<SpriteRenderer>();
+
     }
 
     private void OnEnable()
@@ -70,17 +76,41 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         isGrounded = Physics2D.OverlapCircle(groundCheckTransform.position, groundCheckRadius, groundLayer);
-        rb.linearVelocityX = move * speed;
+
+        if (move > 0.01f) facingRight = true;
+        else if (move < -0.01f) facingRight = false;
+
+        if (sr != null) sr.flipX = !facingRight;
+
+        if (isGrounded)
+        {
+            animator.SetBool("isGround", true);
+        }
+        else
+        {
+            animator.SetBool("isGround", false);
+        }
+
+            rb.linearVelocityX = move * speed;
 
         Debug.Log($"Направление: {move}");
         if (move < 0)
         {
+            animator.SetBool("isWalking", true);
             combat.attackPoint.transform.position = new Vector2(transform.position.x - 0.5f, combat.attackPoint.transform.position.y);
         }
         else if (move > 0)
         {
+            animator.SetBool("isWalking", true);
             combat.attackPoint.transform.position = new Vector2(transform.position.x + 0.5f, combat.attackPoint.transform.position.y);
         }
+        else if (move == 0)
+        {
+            animator.SetBool("isWalking", false);
+        }
+
+        
+
     }
 
     void OnDrawGizmosSelected()

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,13 +19,19 @@ public class SimpleCombat : MonoBehaviour
     [SerializeField] private GameObject bulletPrefab;        // префаб пули
     [SerializeField] private Camera mainCamera;              // можно не назначать (возьмЄм Camera.main)
 
+    [SerializeField] private float gunDrawTime = 0.12f;   // подгони под длину анимации доставани€
+    [SerializeField] private float gunFireDelay = 0.03f;  // на каком кадре "вылетает пул€"
+
     private InputSystem_Actions actions;
 
     private float lastMeleeTime = -999f;
     private float lastShootTime = -999f;
+    private Animator animator;
 
     private void Awake()
     {
+        animator = GetComponentInParent<Animator>();
+
         actions = new InputSystem_Actions();
         if (mainCamera == null) mainCamera = Camera.main;
     }
@@ -51,9 +58,32 @@ public class SimpleCombat : MonoBehaviour
     private void OnShoot(InputAction.CallbackContext context)
     {
         Debug.Log("ѕ ћ нажата -> Shoot action сработал");
+
+        // если кулдаун не прошЄл Ч играем "убрать"
+        if (Time.time - lastShootTime < shootCooldown)
+        {
+            if (animator != null) animator.SetTrigger("GunHolster");
+            return;
+        }
+
+        // иначе Ч запускаем последовательность достать->выстрелить
+        StartCoroutine(GunShootSequence());
+        
+    }
+
+    private IEnumerator GunShootSequence()
+    {
         
 
-        DoShoot();
+        if (animator != null) animator.SetTrigger("GunDraw");
+        yield return new WaitForSeconds(gunDrawTime);
+
+        if (animator != null) animator.SetTrigger("GunShoot");
+        yield return new WaitForSeconds(gunFireDelay);
+
+        // “”“ вызывай твой текущий код спавна пули (он у теб€ уже есть)
+        SpawnBullet();
+        lastShootTime = Time.time;
     }
 
     private void DoMeleeAttack()
@@ -62,6 +92,8 @@ public class SimpleCombat : MonoBehaviour
         if (Time.time - lastMeleeTime < meleeCooldown) return;
 
         lastMeleeTime = Time.time;
+
+        if (animator != null) animator.SetTrigger("Melee");
 
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
             attackPoint.position,
@@ -77,7 +109,7 @@ public class SimpleCombat : MonoBehaviour
         }
     }
 
-    private void DoShoot()
+    private void SpawnBullet()
     {
         Debug.Log("ѕ ћ: выстрел вызван");
 
@@ -90,9 +122,6 @@ public class SimpleCombat : MonoBehaviour
         if (bulletPrefab == null || shootPoint == null) return;
         if (mainCamera == null) mainCamera = Camera.main;
         if (mainCamera == null) return;
-
-        if (Time.time - lastShootTime < shootCooldown) return;
-        lastShootTime = Time.time;
 
         // куда целимс€ (в точку курсора)
         Vector2 mouseScreen = Mouse.current.position.ReadValue();
