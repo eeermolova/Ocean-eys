@@ -204,7 +204,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 998ea67f0c2bdfd4cbe357a69c60ada0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleCombat
-  meleeCooldown: 0.1
+  meleeCooldown: 0.3
   meleeDamage: 30
   meleeRange: 0.45
   attackPoint: {fileID: 8709960441716283811}

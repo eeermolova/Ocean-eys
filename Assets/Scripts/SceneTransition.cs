@@ -8,6 +8,6 @@ public class SceneTransition : MonoBehaviour
 
     public void Transition()
     {
-        SceneManager.LoadScene(3);
+        SceneManager.LoadScene(1);
       }
 }
