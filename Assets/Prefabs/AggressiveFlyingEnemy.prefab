@@ -184,7 +184,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -258,6 +258,9 @@ MonoBehaviour:
   attackColor: {r: 1, g: 1, b: 1, a: 1}
   useAnimator: 1
   dashAnimSpeedMultiplier: 1.3
+  spriteFacesRightByDefault: 0
+  destroyDelay: 0.8
+  disableColliderOnDeath: 1
 --- !u!95 &2820162219725681241
 Animator:
   serializedVersion: 7

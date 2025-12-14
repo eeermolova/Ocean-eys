@@ -10,9 +10,9 @@ public class Health : MonoBehaviour
     // Свойства для доступа к значениям здоровья
     public float CurrentHealth => currentHealth;
     public float MaxHealth => maxHealth;
-    public bool IsAlive => currentHealth > 0;
+    public bool IsAlive { get; private set; } = true;
 
-    public event System.Action Damaged;
+    public event System.Action<float> Damaged;
     public event System.Action Died;
 
     private bool diedSent = false; // чтобы Died вызвался 1 раз
@@ -21,29 +21,32 @@ public class Health : MonoBehaviour
     private void Start()
     {
         currentHealth = maxHealth;  // Устанавливаем стартовое здоровье
+        IsAlive = true;
+
     }
 
     // Основной метод для получения урона
     public void TakeDamage(float damage)
     {
-        if (!IsAlive) return;  // Если уже мертв - ничего не делаем
+        if (!IsAlive) return;
 
-        currentHealth -= damage;  // Уменьшаем здоровье
-        if (currentHealth < 0) currentHealth = 0;
-
-        Damaged?.Invoke();
-
-        
-
-        // Выводим в консоль для отладки
-        Debug.Log($"{gameObject.name} получил {damage} урона. Осталось здоровья: {currentHealth}");
-
-        // Проверяем смерть
-        if (!IsAlive && !diedSent)
+        currentHealth -= damage;
+        if (currentHealth <= 0f)
         {
-            diedSent = true;
-            Died?.Invoke();
+            currentHealth = 0f;
+            IsAlive = false;
+
+            if (!diedSent)
+            {
+                diedSent = true;
+                Died?.Invoke();
+            }
+            return; // важно: не вызываем Damaged после смерти
         }
+
+        Damaged?.Invoke(damage);
+
+        Debug.Log($"{gameObject.name} получил {damage} урона. Осталось здоровья: {currentHealth}");
 
     }
 

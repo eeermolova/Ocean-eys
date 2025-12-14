@@ -52,6 +52,19 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
     [SerializeField] private bool useAnimator = true;
     [SerializeField] private float dashAnimSpeedMultiplier = 1.3f; // опционально: ускорить idle при рывке
 
+    [Header("‘лип (направление спрайта)")]
+    [SerializeField] private bool spriteFacesRightByDefault = false;
+
+    [Header("—мерть (удаление)")]
+    [SerializeField] private float destroyDelay = 0.8f; // поставь длину Ghost_damage/Death
+    [SerializeField] private bool disableColliderOnDeath = true;
+
+    [Header(" оллизии (призрак)")]
+    [SerializeField] private bool alwaysTriggerCollider = true; // чтобы не толкал игрока
+
+    private bool deathHandled = false;
+
+
     private Animator animator;
     private bool deathAnimSent = false;
 
@@ -102,12 +115,24 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        if (rb == null) rb = GetComponentInChildren<Rigidbody2D>();
+
         col = GetComponent<Collider2D>();
+        if (col == null) col = GetComponentInChildren<Collider2D>();
+
+        if (alwaysTriggerCollider && col != null)
+            col.isTrigger = true;
+
         enemyHealth = GetComponent<Health>();
+        if (enemyHealth == null) enemyHealth = GetComponentInChildren<Health>();
+
         animator = GetComponent<Animator>();
+        if (animator == null) animator = GetComponentInChildren<Animator>();
 
         if (spriteRenderer == null)
             spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
     private void Start()
@@ -117,6 +142,8 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
             rb.gravityScale = 0f;
             rb.freezeRotation = true;
         }
+
+        if (col != null) col.isTrigger = true;
 
         SetRandomPatrolTarget();
         nextDirectionChangeTime = Time.time + patrolChangeTime;
@@ -131,13 +158,7 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
     {
         if (enemyHealth != null && !enemyHealth.IsAlive)
         {
-            if (useAnimator && animator != null && !deathAnimSent)
-            {
-                deathAnimSent = true;
-                animator.SetBool(ANIM_DEAD, true);
-            }
-
-            if (rb != null) rb.linearVelocity = Vector2.zero;
+            HandleDeath();
             return;
         }
 
@@ -391,6 +412,72 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
         
     }
 
+    private void OnEnable()
+    {
+        if (enemyHealth != null)
+        {
+            enemyHealth.Damaged += OnDamaged;
+            enemyHealth.Died += OnDied;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (enemyHealth != null)
+        {
+            enemyHealth.Damaged -= OnDamaged;
+            enemyHealth.Died -= OnDied;
+        }
+    }
+
+    private void OnDamaged(float dmg)
+    {
+        // ¬ј∆Ќќ: если этот удар был смертельным Ч IsAlive уже false, значит Hit не дергаем
+        if (!useAnimator || animator == null) return;
+        if (deathHandled) return;
+        if (enemyHealth != null && enemyHealth.IsAlive)
+        {
+            animator.SetTrigger(ANIM_HIT); // играет Ghost_damage
+        }
+    }
+
+    private void OnDied()
+    {
+        // чтобы смерть стартовала сразу в момент добивани€
+        if (!deathHandled)
+            HandleDeath();
+    }
+
+
+    private void HandleDeath()
+    {
+        if (deathHandled) return;
+        deathHandled = true;
+
+        if (useAnimator && animator != null)
+        {
+            animator.ResetTrigger(ANIM_HIT);   // важно, чтобы Hit не конфликтовал
+            animator.SetBool(ANIM_DEAD, true); // IsDead=true -> переход в Уdeath/damageФ state
+        }
+
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+
+        // важно: выключить коллайдер/триггер, чтобы не продолжал ловить OnTriggerStay
+        if (disableColliderOnDeath && col != null)
+            col.enabled = false;
+
+        enabled = false;
+
+        StartCoroutine(DestroyAfterDelay());
+    }
+
+    private IEnumerator DestroyAfterDelay()
+    {
+        yield return new WaitForSeconds(destroyDelay);
+        Destroy(gameObject);
+    }
+
+
     private void EnterDashing()
     {
         currentState = State.Dashing;
@@ -401,7 +488,9 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
             closeAttacksDone++;
 
         // делаем триггер-коллайдер, чтобы пролетать сквозь игрока
-        if (col != null) col.isTrigger = true;
+        if (!alwaysTriggerCollider && col != null)
+            col.isTrigger = true;
+
     }
 
     private void EnterDashRecoil()
@@ -410,7 +499,9 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
         stateTimer = dashRecoilTime;
 
         // возвращаем обычные коллизии
-        if (col != null) col.isTrigger = false;
+        //if (!alwaysTriggerCollider && col != null)
+            //col.isTrigger = false;
+
 
         if (attackIndicator != null) attackIndicator.SetActive(false);
     }
@@ -443,6 +534,8 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
 
     private void TryDealDashDamage(Collider2D other)
     {
+        Debug.Log("GHOST: HIT PLAYER");
+
         if (currentState != State.Dashing) return;
         if (dashDidHit) return;
 
@@ -535,10 +628,15 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
 
         spriteRenderer.color = Color.Lerp(spriteRenderer.color, target, Time.deltaTime * 5f);
 
-        if (rb != null)
+        if (rb != null && rb.linearVelocity.x > 0.1f)
         {
-            if (rb.linearVelocity.x > 0.1f) spriteRenderer.flipX = false;
-            else if (rb.linearVelocity.x < -0.1f) spriteRenderer.flipX = true;
+            // движемс€ вправо
+            spriteRenderer.flipX = !spriteFacesRightByDefault;
+        }
+        else if (rb != null && rb.linearVelocity.x < -0.1f)
+        {
+            // движемс€ влево
+            spriteRenderer.flipX = spriteFacesRightByDefault;
         }
     }
 
