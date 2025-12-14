@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 7060d4301270b7542b866767bc1122f2
+guid: 47edc7bbc1dfd1f4ca1a43e306d0425b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4286225737457441659
-    second: "\u041A\u043D\u043E\u043F\u043A\u0430_\u0418\u0433\u0440\u0430\u0442\u044C_0"
+      213: 2022647789051365248
+    second: boollet_pirate_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\u041A\u043D\u043E\u043F\u043A\u0430_\u0418\u0433\u0440\u0430\u0442\u044C_0"
+      name: boollet_pirate_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 3
-        width: 145
-        height: 42
+        x: 4
+        y: 4
+        width: 8
+        height: 8
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b7b994c499bbb7b30800000000000000
-      internalID: 4286225737457441659
+      spriteID: 087c22c9273e11c10800000000000000
+      internalID: 2022647789051365248
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "\u041A\u043D\u043E\u043F\u043A\u0430_\u0418\u0433\u0440\u0430\u0442\u044C_0": 4286225737457441659
+      boollet_pirate_0: 2022647789051365248
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

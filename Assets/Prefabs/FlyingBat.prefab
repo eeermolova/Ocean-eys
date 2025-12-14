@@ -83,7 +83,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_Sprite: {fileID: 8647823593821616703, guid: e9b8781a347137a4e95edbde767f5dbf, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -199,7 +199,7 @@ MonoBehaviour:
   patrolAreaMax: {x: 18.9, y: 6.44}
   chaseSpeed: 4
   detectionRange: 10
-  attackRange: 0.8
+  attackRange: 0.44
   attackDamage: 10
   attackCooldown: 1
   attackKnockback: 5
@@ -210,6 +210,9 @@ MonoBehaviour:
   spriteFacesRightByDefault: 0
   useAnimator: 1
   chaseAnimSpeedMultiplier: 1.2
+  hasAttackAnimation: 0
+  destroyDelay: 0.8
+  disableColliderOnDeath: 1
 --- !u!95 &8762048058361458726
 Animator:
   serializedVersion: 7

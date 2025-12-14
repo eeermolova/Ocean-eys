@@ -206,7 +206,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SimpleCombat
   meleeCooldown: 0.1
   meleeDamage: 30
-  meleeRange: 0.93
+  meleeRange: 0.45
   attackPoint: {fileID: 8709960441716283811}
   enemyLayer:
     serializedVersion: 2
@@ -231,7 +231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e23da1b1a096964883a96fa34dc042d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  maxHealth: 1000000
+  maxHealth: 1000
 --- !u!95 &6188449988471442689
 Animator:
   serializedVersion: 7
@@ -268,6 +268,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimEvents
   deathMenuStub: {fileID: 0}
   freezeDelay: 0.05
+  health: {fileID: 0}
 --- !u!1 &1652232594622832267
 GameObject:
   m_ObjectHideFlags: 0
@@ -324,7 +325,7 @@ Transform:
   m_GameObject: {fileID: 4372448243342830619}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.539, y: -0.245, z: 0}
+  m_LocalPosition: {x: 0.51, y: -0.13, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -355,7 +356,7 @@ Transform:
   m_GameObject: {fileID: 7369443979131393079}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.084, y: 0.009, z: 0}
+  m_LocalPosition: {x: 0.57, y: -0.11, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

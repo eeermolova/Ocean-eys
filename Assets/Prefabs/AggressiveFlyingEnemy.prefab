@@ -115,7 +115,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_Sprite: {fileID: -2205440430153107873, guid: eaf719a78fc09b049b85b84feef87e0c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -261,6 +261,7 @@ MonoBehaviour:
   spriteFacesRightByDefault: 0
   destroyDelay: 0.8
   disableColliderOnDeath: 1
+  alwaysTriggerCollider: 1
 --- !u!95 &2820162219725681241
 Animator:
   serializedVersion: 7
