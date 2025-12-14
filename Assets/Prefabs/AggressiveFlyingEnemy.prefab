@@ -188,7 +188,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.1807344, y: 0.042088747}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -198,7 +198,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.36124086, y: 0.52959585}
   m_EdgeRadius: 0
 --- !u!114 &7601240711995701263
 MonoBehaviour:
@@ -230,10 +230,10 @@ MonoBehaviour:
   patrolAreaMin: {x: -15, y: -9}
   patrolAreaMax: {x: 15, y: 9.12}
   chaseSpeed: 6
-  detectionRange: 10
-  dashStartRange: 2.2
+  detectionRange: 5.49
+  dashStartRange: 0.54
   dashWindupTime: 0.15
-  dashSpeed: 12
+  dashSpeed: 8
   dashMaxTime: 0.5
   dashDamage: 25
   dashPlayerKnockback: 5
@@ -241,8 +241,8 @@ MonoBehaviour:
   dashRecoilSpeed: 7
   dashRecoilTime: 0.35
   dashCooldown: 1.6
-  rangedMinRange: 3.5
-  rangedMaxRange: 8
+  rangedMinRange: 2.97
+  rangedMaxRange: 6.95
   rangedWindupTime: 0.25
   rangedCooldown: 1.2
   projectilePrefab: {fileID: 1702280675475651118, guid: a6cffc03338168549b4cc63c2d983b45, type: 3}
@@ -256,6 +256,8 @@ MonoBehaviour:
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   chaseColor: {r: 1, g: 1, b: 1, a: 1}
   attackColor: {r: 1, g: 1, b: 1, a: 1}
+  useAnimator: 1
+  dashAnimSpeedMultiplier: 1.3
 --- !u!95 &2820162219725681241
 Animator:
   serializedVersion: 7

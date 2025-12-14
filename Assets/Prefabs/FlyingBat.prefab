@@ -129,7 +129,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.020139217, y: -0.07854378}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -139,7 +139,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.34748268, y: 0.19039512}
   m_EdgeRadius: 0
 --- !u!114 &5921831442102501990
 MonoBehaviour:
@@ -199,7 +199,7 @@ MonoBehaviour:
   patrolAreaMax: {x: 18.9, y: 6.44}
   chaseSpeed: 4
   detectionRange: 10
-  attackRange: 1.5
+  attackRange: 0.8
   attackDamage: 10
   attackCooldown: 1
   attackKnockback: 5
@@ -207,6 +207,9 @@ MonoBehaviour:
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   chaseColor: {r: 1, g: 1, b: 1, a: 1}
   attackColor: {r: 1, g: 1, b: 1, a: 1}
+  spriteFacesRightByDefault: 0
+  useAnimator: 1
+  chaseAnimSpeedMultiplier: 1.2
 --- !u!95 &8762048058361458726
 Animator:
   serializedVersion: 7
@@ -217,7 +220,7 @@ Animator:
   m_GameObject: {fileID: 5622982507469765328}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: bf0361486282a684bb7ad2fcb020e80e, type: 2}
+  m_Controller: {fileID: 9100000, guid: cca4e4c0c962a1e4eae56103ce1d5502, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

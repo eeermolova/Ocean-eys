@@ -1,6 +1,7 @@
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -18,7 +19,8 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundLayer;
 
     bool isGrounded;
-
+    private SpriteRenderer sr;
+    private bool facingRight = true;
     float move;
 
     private Rigidbody2D rb;
@@ -30,6 +32,8 @@ public class PlayerController : MonoBehaviour
         actions = new InputSystem_Actions();
         combat = GetComponentInChildren<SimpleCombat>();
         animator = GetComponent<Animator>();
+        sr = GetComponentInChildren<SpriteRenderer>();
+
     }
 
     private void OnEnable()
@@ -72,7 +76,13 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         isGrounded = Physics2D.OverlapCircle(groundCheckTransform.position, groundCheckRadius, groundLayer);
-        if(isGrounded)
+
+        if (move > 0.01f) facingRight = true;
+        else if (move < -0.01f) facingRight = false;
+
+        if (sr != null) sr.flipX = !facingRight;
+
+        if (isGrounded)
         {
             animator.SetBool("isGround", true);
         }
@@ -98,6 +108,9 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetBool("isWalking", false);
         }
+
+        
+
     }
 
     void OnDrawGizmosSelected()
