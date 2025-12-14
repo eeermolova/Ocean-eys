@@ -84,8 +84,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Sprite: {fileID: 8647823593821616703, guid: e9b8781a347137a4e95edbde767f5dbf, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -133,7 +133,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.75, y: 0.75}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -205,8 +205,8 @@ MonoBehaviour:
   attackKnockback: 5
   attackIndicator: {fileID: 0}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
-  chaseColor: {r: 1, g: 0, b: 0, a: 1}
-  attackColor: {r: 1, g: 0, b: 1, a: 1}
+  chaseColor: {r: 1, g: 1, b: 1, a: 1}
+  attackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!95 &8762048058361458726
 Animator:
   serializedVersion: 7
@@ -217,7 +217,7 @@ Animator:
   m_GameObject: {fileID: 5622982507469765328}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: e6831f015160e2c4193047188424eb44, type: 2}
+  m_Controller: {fileID: 9100000, guid: bf0361486282a684bb7ad2fcb020e80e, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 113223016018291350}
   - component: {fileID: 4728158254416368468}
   - component: {fileID: 6188449988471442689}
+  - component: {fileID: 4194898960275645327}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -170,7 +171,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!114 &6535121741425890878
 MonoBehaviour:
@@ -216,6 +217,8 @@ MonoBehaviour:
   shootPoint: {fileID: 1478460880593615771}
   bulletPrefab: {fileID: 2466191536899542944, guid: 868f4d28d0575e0419c42e882aa50e01, type: 3}
   mainCamera: {fileID: 0}
+  gunDrawTime: 0.12
+  gunFireDelay: 0.03
 --- !u!114 &4728158254416368468
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -251,6 +254,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4194898960275645327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 956474334505774150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5b7f681698dca14c9013614075fe46d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimEvents
+  deathMenuStub: {fileID: 0}
+  freezeDelay: 0.05
 --- !u!1 &1652232594622832267
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class FlyingBatEnemy : MonoBehaviour
 {
@@ -24,6 +25,16 @@ public class FlyingBatEnemy : MonoBehaviour
     [SerializeField] private Color chaseColor = Color.red;
     [SerializeField] private Color attackColor = Color.magenta;
 
+    [Header("Анимации (Bat)")]
+    [SerializeField] private bool useAnimator = true;
+    [SerializeField] private float chaseAnimSpeedMultiplier = 1.2f; // опционально
+
+    private Animator animator;
+    private bool deathAnimSent = false;
+
+    private static readonly int ANIM_ATTACK = Animator.StringToHash("Attack");
+    private static readonly int ANIM_DEAD = Animator.StringToHash("IsDead");
+
     // Компоненты
     private Transform player;
     private Rigidbody2D rb;
@@ -47,6 +58,7 @@ public class FlyingBatEnemy : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         enemyHealth = GetComponent<Health>();
+        animator = GetComponent<Animator>();
     }
 
     private void Start()
@@ -77,6 +89,12 @@ public class FlyingBatEnemy : MonoBehaviour
         // Проверка здоровья
         if (enemyHealth != null && !enemyHealth.IsAlive)
         {
+            if (useAnimator && animator != null && !deathAnimSent)
+            {
+                deathAnimSent = true;
+                animator.SetBool(ANIM_DEAD, true);
+            }
+
             rb.linearVelocity = Vector2.zero;
             return;
         }
@@ -265,6 +283,9 @@ public class FlyingBatEnemy : MonoBehaviour
     private void PerformAttack()
     {
         if (!canAttack) return;
+
+        if (useAnimator && animator != null)
+            animator.SetTrigger(ANIM_ATTACK);
 
         Health playerHealth = player.GetComponent<Health>();
         if (playerHealth != null)

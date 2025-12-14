@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class AggressiveFlyingEnemy2 : MonoBehaviour
 {
@@ -47,6 +48,17 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
     [SerializeField] private Color chaseColor = Color.red;
     [SerializeField] private Color attackColor = Color.magenta;
 
+    [Header("Анимации (призрак)")]
+    [SerializeField] private bool useAnimator = true;
+    [SerializeField] private float dashAnimSpeedMultiplier = 1.3f; // опционально: ускорить idle при рывке
+
+    private Animator animator;
+    private bool deathAnimSent = false;
+
+    private static readonly int ANIM_SHOOT = Animator.StringToHash("Attack2");
+    private static readonly int ANIM_HIT = Animator.StringToHash("Hit");
+    private static readonly int ANIM_DEAD = Animator.StringToHash("IsDead");
+
     private Transform player;
     private Rigidbody2D rb;
     private Collider2D col;
@@ -92,6 +104,7 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         enemyHealth = GetComponent<Health>();
+        animator = GetComponent<Animator>();
 
         if (spriteRenderer == null)
             spriteRenderer = GetComponent<SpriteRenderer>();
@@ -118,6 +131,12 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
     {
         if (enemyHealth != null && !enemyHealth.IsAlive)
         {
+            if (useAnimator && animator != null && !deathAnimSent)
+            {
+                deathAnimSent = true;
+                animator.SetBool(ANIM_DEAD, true);
+            }
+
             if (rb != null) rb.linearVelocity = Vector2.zero;
             return;
         }
@@ -368,6 +387,8 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
         if (dashDir.sqrMagnitude < 0.0001f) dashDir = Vector2.right;
 
         if (attackIndicator != null) attackIndicator.SetActive(true);
+
+        
     }
 
     private void EnterDashing()
@@ -404,6 +425,9 @@ public class AggressiveFlyingEnemy2 : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
 
         if (attackIndicator != null) attackIndicator.SetActive(true);
+
+        if (useAnimator && animator != null)
+            animator.SetTrigger(ANIM_SHOOT);
     }
 
     private void EnterCooldown(float cd)
